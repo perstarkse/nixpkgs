@@ -15,6 +15,6 @@ meta = with lib; {
 description = "LSP-AI is an open-source language server that serves as a backend for AI-powered functionality, designed to assist and empower software engineers, not replace them.";
 homepage = "https://github.com/SilasMarvin/lsp-ai";
 license = licenses.mit;
-maintainers = [perstarkse];
+maintainers = [maintainers.perstarkse];
 };
 }
