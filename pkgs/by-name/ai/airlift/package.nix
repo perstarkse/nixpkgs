@@ -21,7 +21,11 @@ python3.pkgs.buildPythonApplication rec {
     sed -i '/argparse/d' pyproject.toml
   '';
 
-   nativeBuildInputs = [
+  pythonRelaxDeps = [
+    "hiyapyco"
+  ];
+
+  nativeBuildInputs = [
     python3.pkgs.poetry-core
   ];
 

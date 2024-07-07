@@ -2,26 +2,15 @@
   lib,
   aiohttp,
   async-timeout,
-  azure-core,
-  azure-cosmos,
-  azure-identity,
   bash,
   buildPythonPackage,
-  chardet,
-  clarifai,
-  cohere,
-  esprima,
   fetchFromGitHub,
   freezegun,
-  huggingface-hub,
   langchain-core,
   langchain-text-splitters,
   langsmith,
   lark,
-  manifest-ml,
-  nlpcloud,
   numpy,
-  openai,
   pandas,
   poetry-core,
   pydantic,
@@ -31,24 +20,18 @@
   pytestCheckHook,
   pythonOlder,
   pyyaml,
-  qdrant-client,
   requests-mock,
   requests,
   responses,
-  sentence-transformers,
   sqlalchemy,
   syrupy,
   tenacity,
-  tiktoken,
   toml,
-  torch,
-  transformers,
-  typer,
 }:
 
 buildPythonPackage rec {
   pname = "langchain";
-  version = "0.2.1";
+  version = "0.2.9";
   pyproject = true;
 
   disabled = pythonOlder "3.8";
@@ -56,8 +39,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "langchain-ai";
     repo = "langchain";
-    rev = "refs/tags/langchain==${version}";
-    hash = "sha256-cLJhdeft9XNLk5njSBaEBSuP31c2VFCJ1ET+ypo6mNY=";
+    rev = "refs/tags/langchain-core==${version}";
+    hash = "sha256-/BUn/NxaE9l3VY6dPshr1JJaHTGzn9NMQhSQ2De65Jg=";
   };
 
   sourceRoot = "${src.name}/libs/langchain";
@@ -78,46 +61,6 @@ buildPythonPackage rec {
     sqlalchemy
     tenacity
   ] ++ lib.optionals (pythonOlder "3.11") [ async-timeout ];
-
-  passthru.optional-dependencies = {
-    llms = [
-      clarifai
-      cohere
-      openai
-      # openlm
-      nlpcloud
-      huggingface-hub
-      manifest-ml
-      torch
-      transformers
-    ];
-    qdrant = [ qdrant-client ];
-    openai = [
-      openai
-      tiktoken
-    ];
-    text_helpers = [ chardet ];
-    clarifai = [ clarifai ];
-    cohere = [ cohere ];
-    docarray = [
-      # docarray
-    ];
-    embeddings = [ sentence-transformers ];
-    javascript = [ esprima ];
-    azure = [
-      azure-identity
-      azure-cosmos
-      openai
-      azure-core
-      # azure-ai-formrecognizer
-      # azure-ai-vision
-      # azure-cognitiveservices-speech
-      # azure-search-documents
-      # azure-ai-textanalytics
-    ];
-    all = [ ];
-    cli = [ typer ];
-  };
 
   nativeCheckInputs = [
     freezegun
@@ -164,12 +107,12 @@ buildPythonPackage rec {
     updateScript = langchain-core.updateScript;
   };
 
-  meta = with lib; {
+  meta = {
     description = "Building applications with LLMs through composability";
     homepage = "https://github.com/langchain-ai/langchain";
     changelog = "https://github.com/langchain-ai/langchain/releases/tag/v${version}";
-    license = licenses.mit;
-    maintainers = with maintainers; [ natsukium ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ natsukium ];
     mainProgram = "langchain-server";
   };
 }
