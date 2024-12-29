@@ -1,6 +1,7 @@
 {
   stdenv,
   lib,
+  gcc13,
   fetchpatch,
   fetchFromGitHub,
   makeDesktopItem,
@@ -66,6 +67,7 @@ in
     ];
 
     nativeBuildInputs = [
+      gcc13
       cmake
       pkg-config
       wayland-scanner
@@ -109,11 +111,7 @@ in
       ];
 
     cmakeFlags =
-      [
-        "-DOPTIMIZE_FOR_NATIVE=OFF"
-        "-DCMAKE_C_FLAGS=-Wno-error -Wno-error=maybe-uninitialized"
-        "-DCMAKE_CXX_FLAGS=-Wno-error -Wno-error=maybe-uninitialized"
-      ]
+      ["-DOPTIMIZE_FOR_NATIVE=OFF"]
       ++ lib.optionals (!openGLSupport) ["-DENABLE_OPENGL=no"]
       ++ lib.optionals (!xorgSupport) ["-DENABLE_X11=no"]
       ++ lib.optionals (!waylandSupport) ["-DENABLE_WAYLAND=no"]
