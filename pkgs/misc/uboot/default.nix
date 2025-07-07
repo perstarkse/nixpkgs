@@ -27,6 +27,7 @@
   armTrustedFirmwareRK3568,
   armTrustedFirmwareRK3588,
   armTrustedFirmwareS905,
+  opensbi,
   buildPackages,
 }@pkgs:
 
@@ -43,7 +44,7 @@ let
     ncurses # tools/kwboot
     libuuid # tools/mkeficapsule
     gnutls # tools/mkeficapsule
-    openssl # tools/mkimage
+    openssl # tools/mkimage and tools/env/fw_printenv
   ];
 
   buildUBoot = lib.makeOverridable (
@@ -176,6 +177,7 @@ in
       "HOST_TOOLS_ALL=y"
       "NO_SDL=1"
       "cross_tools"
+      "envtools"
     ];
 
     outputs = [
@@ -185,13 +187,20 @@ in
 
     postInstall = ''
       installManPage doc/*.1
+
+      # from u-boot's tools/env/README:
+      # "You should then create a symlink from fw_setenv to fw_printenv. They
+      # use the same program and its function depends on its basename."
+      ln -s $out/bin/fw_printenv $out/bin/fw_setenv
     '';
+
     filesToInstall = [
       "tools/dumpimage"
       "tools/fdtgrep"
       "tools/kwboot"
       "tools/mkenvimage"
       "tools/mkimage"
+      "tools/env/fw_printenv"
     ];
 
     pythonScriptsToInstall = {
@@ -807,6 +816,26 @@ in
     # sata init; load sata 0 $loadaddr u-boot-with-nand-spl.imx
     # sf probe; sf update $loadaddr 0 80000
   };
+
+  ubootVisionFive2 =
+    let
+      opensbi_vf2 = opensbi.overrideAttrs (attrs: {
+        makeFlags = attrs.makeFlags ++ [
+          # Matches u-boot documentation: https://docs.u-boot.org/en/latest/board/starfive/visionfive2.html
+          "FW_TEXT_START=0x40000000"
+          "FW_OPTIONS=0"
+        ];
+      });
+    in
+    buildUBoot {
+      defconfig = "starfive_visionfive2_defconfig";
+      extraMeta.platforms = [ "riscv64-linux" ];
+      OPENSBI = "${opensbi_vf2}/share/opensbi/lp64/generic/firmware/fw_dynamic.bin";
+      filesToInstall = [
+        "spl/u-boot-spl.bin.normal.out"
+        "u-boot.itb"
+      ];
+    };
 
   ubootWandboard = buildUBoot {
     defconfig = "wandboard_defconfig";

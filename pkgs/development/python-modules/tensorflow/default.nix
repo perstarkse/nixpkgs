@@ -55,7 +55,7 @@
   jsoncpp,
   nsync,
   curl,
-  snappy,
+  snappy-cpp,
   flatbuffers-core,
   icu,
   double-conversion,
@@ -70,7 +70,7 @@
   config,
   cudaSupport ? config.cudaSupport,
   cudaPackages,
-  cudaCapabilities ? cudaPackages.cudaFlags.cudaCapabilities,
+  cudaCapabilities ? cudaPackages.flags.cudaCapabilities,
   mklSupport ? false,
   mkl,
   tensorboardSupport ? true,
@@ -149,7 +149,7 @@ let
   ];
 
   cudatoolkitDevMerged = symlinkJoin {
-    name = "cuda-${cudaPackages.cudaVersion}-dev-merged";
+    name = "cuda-${cudaPackages.cudaMajorMinorVersion}-dev-merged";
     paths = lib.concatMap (p: [
       (lib.getBin p)
       (lib.getDev p)
@@ -328,7 +328,7 @@ let
         (pybind11.overridePythonAttrs (_: {
           inherit stdenv;
         }))
-        snappy
+        snappy-cpp
         sqlite
       ]
       ++ lib.optionals cudaSupport [
@@ -599,7 +599,7 @@ let
 in
 buildPythonPackage {
   __structuredAttrs = true;
-  inherit version pname;
+  inherit version pname format;
   disabled = pythonAtLeast "3.12";
 
   src = bazel-build.python;
